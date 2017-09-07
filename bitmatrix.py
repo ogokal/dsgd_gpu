@@ -1,7 +1,8 @@
 from bitarray import bitarray
+import threading
 
 class bitmatrix:
-    def __init__(self,bArrayVal=None, bMatVal=None, shape=None):
+    def __init__(self,bArrayVal=None, bMatVal=None, shape=None,locked=False):
         self.bArray = bArrayVal
         if bMatVal:
             self.bMat = bMatVal
@@ -11,6 +12,9 @@ class bitmatrix:
             self.shape = (len(bMatVal), len(bMatVal[0]))
         if bArrayVal and shape:
             self.reshape(shape)
+        self.locked = locked
+        if locked:
+            self.lock = threading.Lock()
     
     def reshape(self, shape):
         step = shape[1]
@@ -88,14 +92,25 @@ class bitmatrix:
         self.__setitem__((slice(None, None, None), slice(None, None, None)),val)
         
     def findfirst(self, val=False):
-        found = None
-        for r in xrange(len(self.bMat)):
-            try:
-                found = (r,self.bMat[r].index(val))
-                break
-            except ValueError:
-                pass
-        return found
+        if self.locked:
+            with self.lock:
+                found = None
+                for r in xrange(len(self.bMat)):
+                    try:
+                        found = (r,self.bMat[r].index(val))
+                        break
+                    except ValueError:
+                        pass
+                return found
+        else:
+            found = None
+            for r in xrange(len(self.bMat)):
+                try:
+                    found = (r,self.bMat[r].index(val))
+                    break
+                except ValueError:
+                    pass
+            return found
     
     def __setitem__(self, sli, bMatNew):
         boundries = self.__extractSliceBoundries__(sli)

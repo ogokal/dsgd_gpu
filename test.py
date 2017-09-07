@@ -25,17 +25,15 @@ vMat = np.concatenate((vMat,np.ones((5,2), dtype=np.int32)),axis=1)
 
 
 #import stratum
-#ext = stratum.stratumExtractor(vMat,2,2)
-
-
-#for stra in ext.nextStratum():
-#    for s in stra:
-#        print s.straIdx
-#        ext.printstratum(s)
-
+#ext = stratum.stratumExtractor(vMat,2,2,preAllocedData=True)
+#
+#
+#for stra in ext.nextStratum(asNamed=True):
+#    for s in stra.substratum:
+#            print s
 
         
-#ext.extractExcessiveStratums()
+#ext.extractExcessiveStratums() 
 #print vMat
 
 
@@ -52,8 +50,13 @@ vMat = np.concatenate((vMat,np.ones((5,2), dtype=np.int32)),axis=1)
 #d = bitmatrix(bArrayVal=bitarray(2**20), shape=(2,524288))
 #print d
 
-dsg = dsgd_cpu.Cdsgd(vMat.copy(),3,3,2)
-dsg.run()
-print vMat
-print ""
-print dsg.v
+#dsg = dsgd_cpu.Cdsgd(vMat.copy(),3,3,2)
+#dsg.run()
+#print vMat
+#print ""
+#print dsg.v
+
+import allalloc_cl_sgd
+
+gpuDsgd = allalloc_cl_sgd.GpuDSgd(vMat)
+gpuDsgd.run()
